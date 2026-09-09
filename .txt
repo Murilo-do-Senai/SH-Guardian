@@ -1,5 +1,0 @@
-# Set your username globally
-$ git config --global user.name "Your Name"
-
-# Set your email globally
-$ git config --global user.email "youremail@example.com"
