@@ -6,7 +6,7 @@ app.use(express.json());
 
 app.use(cors());
 
-app.get("/", (req, res) => res.json({ ok: true, api: "Top Players API" }));
+app.get("/", (req, res) => res.json({ ok: true, api: "SH Guardian API" }));
 
 
 export default app;
