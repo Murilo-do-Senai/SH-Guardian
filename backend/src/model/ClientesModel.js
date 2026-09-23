@@ -101,20 +101,20 @@ export async function RegistroTelefone(fone,id_cliente) {
     
 }
 
-export async function AtualizarTelefone(id,FONE) {
+export async function AtualizarTelefone(FONE,ID_CLIENTE) {
 
     const [resultado] = await conexao.query(`
-        UPDATE TELEFONE SET FONE = ? WHERE ID = ?
-        `,[id,FONE])
+        UPDATE TELEFONE SET FONE = ? WHERE ID_CLIENTE = ?
+        `,[FONE,ID_CLIENTE])
 
-        return resultado[0]
+        return resultado.affectedRows;
     
 }
 
-export async function DeletarTelefone(id){
+export async function DeletarTelefone(id_cliente){
     const [resultado] = await conexao.query(`
-        DELETE FROM TELEFONE WHERE ID = ?
-        `,[id])
+        DELETE FROM TELEFONE WHERE ID_cliente = ?
+        `,[id_cliente])
 
-        return resultado[0]
+        return resultado[0];
 }

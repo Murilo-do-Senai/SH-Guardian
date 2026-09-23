@@ -91,20 +91,69 @@ export const AtualizarCliente = async(req,res) =>{
 }
 
 export const DeletarCliente = async(req,res) =>{
-
-    try {
         const id = req.params.id;
-
-        if(!id) return res.status(404).json({msg:"Usuario não encontrado"});
-
+    try {
         const deletar = await ClienteModel.DeletarCliente(id);
 
-        res.status(201).json({msg:"Dados apagados com exito"})
+        if(!deletar) return res.status(404).json({msg:"Usuario não encontrado",id});
+
+
+        res.status(200).json({msg:"Dados apagados com exito"})
         
     }
     catch(error)
     {
         res.status(500).json({msg:"Ocorreu um erro ao apagar"})
+        console.error(error);
+    }
+}
+
+export const RegistroTelefone = async(req,res) => {
+    const id_cliente = req.params.id;
+    const {fone} = req.body;
+    try{
+        const RegisFone = await ClienteModel.RegistroTelefone(fone,id_cliente);
+
+        if(!fone) return res.status(400).json({msg:"É necessário preencher o campo"})
+
+        res.status(201).json({msg:"Novo telefone adicionado"})
+    }
+    catch(error){
+        res.status(500).json({msg:"Ocorreu um erro ao registrar"})
+        console.error(error);
+    }
+}
+
+export const AtualizarTelefone = async(req,res) => {
+    const id_cliente = req.params.id;
+    const {fone} = req.body;
+    try{
+        const AtuFone = await ClienteModel.AtualizarTelefone(fone,id_cliente);
+
+        if(!fone) return res.status(400).json({msg:"É necessário preencher o campo"});
+
+        if(!AtuFone) return res.status(400).json({msg:"Não encontrado"});
+
+        res.status(201).json({msg:"Telefone atualizado"});
+    }
+    catch(error){
+        res.status(500).json({msg:"Ocorreu um erro ao atualizar"});
+        console.error(error);
+    }
+}
+
+export const DeletarTelefone = async(req,res) => {
+
+    const id_cliente = req.params.id;
+    try{
+        const DelFone = await ClienteModel.DeletarTelefone(id_cliente);
+
+        if(!DelFone) return res.status(400).json({msg:"Não encontrado"});
+
+        res.status(201).json({msg:"Telefone apagado"});
+    }
+    catch(error){
+        res.status(500).json({msg:"Ocorreu um erro ao apagar"});
         console.error(error);
     }
 }
