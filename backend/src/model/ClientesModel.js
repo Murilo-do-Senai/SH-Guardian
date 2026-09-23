@@ -3,24 +3,28 @@ import { conexao } from "../config/SQL.js";
 export async function ListarCliente(){
     const [resultado] = await conexao.query(`
         SELECT ID,NOME,CPF,
-        EMAIL,SENHA,ENDERECO,PLANO
+        EMAIL,SENHA,ENDERECO,PLANO,telefone.FONE,CARTAO.CARTAO_NUM,CARTAO.TIPO
 
         FROM clientes
+        left JOIN telefone ON clientes.ID = telefone.ID_CLIENTE
+        left JOIN cartao ON clientes.ID = CARTAO.ID_CLIENTE;
         `)
 
     return resultado;
 }
 export async function ListarClienteId(id){
     const [resultado] = await conexao.query(`
-        SELECT ID, NOME, CPF,
-        EMAIL,SENHA,ENDERECO,PLANO
+        SELECT ID,NOME,CPF,
+        EMAIL,SENHA,ENDERECO,PLANO,telefone.FONE,CARTAO.CARTAO_NUM,CARTAO.TIPO
 
         FROM clientes
-        
+        left JOIN telefone ON clientes.ID = telefone.ID_CLIENTE
+        left JOIN cartao ON clientes.ID = CARTAO.ID_CLIENTE
+
         WHERE ID = ?
         `,[id])
 
-    return resultado;
+    return resultado[0];
 }
 
 export async function RegistroCliente({nome,cpf,email,senha,endereco,plano}) {
@@ -34,20 +38,21 @@ export async function RegistroCliente({nome,cpf,email,senha,endereco,plano}) {
     
 }
 
-export async function AtualizarCliente(id,nome,email,endereco,plano) {
+export async function AtualizarCliente(id,nome,email,endereco,plano,) {
 
     const [resultado] = await conexao.query(`
-        UPDATE CLIENTE SET NOME = ?,EMAIL = ?,ENDERECO = ?,PLANO = ?
+        UPDATE CLIENTES SET NOME = ?,EMAIL = ?,ENDERECO = ?,PLANO = ?
         WHERE ID = ?
-        `,[id,nome,email,endereco,plano])
+        `,[nome,email,endereco,plano || "essencial", id])
 
-        return resultado[0]
+        return resultado.affectedRows;
     
 }
 
 export async function DeletarCliente(id){
+
     const [resultado] = await conexao.query(`
-        DELETE FROM CLIENTES WHERE ID = ?
+        DELETE FROM CLIENTES WHERE ID = ?;
         `,[id])
 
         return resultado[0];
@@ -55,12 +60,12 @@ export async function DeletarCliente(id){
 
 ///////////////////////////////////////////////////////////////////////////////
 
-export async function RegistroCatao(CARTAO_NUM,TIPO,ID_CLIENTE) {
+export async function RegistroCartao(CARTAO_NUM,TIPO,id_cliente) {
 
     const [resultado] = await conexao.query(`
-        INSERT INTO CARTAO
-        VALUES (?,?) WHERE ID_CLIEANTE = ?
-        `,[CARTAO_NUM,TIPO || "credito"|| "debito",ID_CLIENTE])
+        INSERT INTO CARTAO (CARTAO_NUM,TIPO,id_cliente)
+        VALUES (?,?,?)
+        `,[CARTAO_NUM,TIPO || "credito"|| "debito",id_cliente])
 
     return resultado.insertId;
     
@@ -69,14 +74,14 @@ export async function RegistroCatao(CARTAO_NUM,TIPO,ID_CLIENTE) {
 export async function AtualizarCartao(id,CARTAO_NUM,TIPO) {
 
     const [resultado] = await conexao.query(`
-        UPDATE CARTAO SET CARTAO_NUM = ?,TIPO = ? WHERE ID = ?
-        `,[id,CARTAO_NUM,TIPO])
+        UPDATE CARTAO SET CARTAO_NUM = ?,TIPO = ? 
+        `,[id,CARTAO_NUM,TIPO || "credito"|| "debito"])
 
         return resultado[0]
     
 }
 
-export async function DeletarClartao(id){
+export async function DeletarCartao(id){
     const [resultado] = await conexao.query(`
         DELETE FROM CARTAO WHERE ID = ?
         `,[id])
@@ -85,12 +90,12 @@ export async function DeletarClartao(id){
 
 /////////////////////////////////////////////////////////////////////////////////
 
-export async function RegistroTelefone(FONE,ID_CLIENTE) {
+export async function RegistroTelefone(fone,id_cliente) {
 
     const [resultado] = await conexao.query(`
-        INSERT INTO TELEFONE
-        VALUES (?) WHERE ID_CLIEANTE = ?
-        `,[FONE,ID_CLIENTE])
+        INSERT INTO TELEFONE (FONE,id_cliente)
+        VALUES (?,?)
+        `,[fone,id_cliente])
 
     return resultado.insertId;
     
@@ -99,7 +104,7 @@ export async function RegistroTelefone(FONE,ID_CLIENTE) {
 export async function AtualizarTelefone(id,FONE) {
 
     const [resultado] = await conexao.query(`
-        UPDATE CLIENTE SET FONE = ? WHERE ID = ?
+        UPDATE TELEFONE SET FONE = ? WHERE ID = ?
         `,[id,FONE])
 
         return resultado[0]
