@@ -40,13 +40,13 @@ export const RegistroCliente = async(req,res) =>{
 
         if (!nome || !cpf || !email || !senha || !endereco || !fone || !cartao_num) {
             return res.status(400).json({ messagem: "É necessário preencher os campos" })
-        }
+        };
 
         const [rows] = await conexao.query("SELECT * FROM CLIENTES WHERE email = ?", [email]);
 
         if (rows.length > 0) {
             return res.status(400).json({ messagem: "Email ja cadastrado" })
-        }
+        };
 
        const senhaCriptografa = await bcrypt.hash(senha, 10);
 
@@ -56,7 +56,7 @@ export const RegistroCliente = async(req,res) =>{
 
         const cartao = await ClienteModel.RegistroCartao(cartao_num,tipo,id);
 
-        res.status(201).json({msg:"Resgistro completo com exito",id})
+        res.status(201).json({msg:"Resgistro completo com exito",id});
 
     }
     catch(error)
@@ -108,6 +108,8 @@ export const DeletarCliente = async(req,res) =>{
     }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 export const RegistroTelefone = async(req,res) => {
     const id_cliente = req.params.id;
     const {fone} = req.body;
@@ -125,16 +127,18 @@ export const RegistroTelefone = async(req,res) => {
 }
 
 export const AtualizarTelefone = async(req,res) => {
-    const id_cliente = req.params.id;
+    const id_cliente = req.params.id_cliente;
+    const id_telefone = req.params.id_telefone;
+
     const {fone} = req.body;
     try{
-        const AtuFone = await ClienteModel.AtualizarTelefone(fone,id_cliente);
+        const AtuFone = await ClienteModel.AtualizarTelefone(fone,id_cliente,id_telefone);
 
         if(!fone) return res.status(400).json({msg:"É necessário preencher o campo"});
 
-        if(!AtuFone) return res.status(400).json({msg:"Não encontrado"});
+        if(!AtuFone) return res.status(404).json({msg:"Não encontrado"});
 
-        res.status(201).json({msg:"Telefone atualizado"});
+        res.status(200).json({msg:"Telefone atualizado"});
     }
     catch(error){
         res.status(500).json({msg:"Ocorreu um erro ao atualizar"});
@@ -144,13 +148,69 @@ export const AtualizarTelefone = async(req,res) => {
 
 export const DeletarTelefone = async(req,res) => {
 
-    const id_cliente = req.params.id;
+    const id_cliente = req.params.id_cliente;
+    const id_telefone = req.params.id_telefone;
+
     try{
-        const DelFone = await ClienteModel.DeletarTelefone(id_cliente);
+        const DelFone = await ClienteModel.DeletarTelefone(id_cliente,id_telefone);
 
-        if(!DelFone) return res.status(400).json({msg:"Não encontrado"});
+        if(!DelFone) return res.status(404).json({msg:"Não encontrado"});
 
-        res.status(201).json({msg:"Telefone apagado"});
+        res.status(200).json({msg:"Telefone apagado"});
+    }
+    catch(error){
+        res.status(500).json({msg:"Ocorreu um erro ao apagar"});
+        console.error(error);
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+export const RegistroCartao = async(req,res) => {
+    const id_cliente = req.params.id;
+    const {cartao_num,tipo} = req.body;
+    try{
+        const RegisCartao = await ClienteModel.RegistroCartao(cartao_num,tipo,id_cliente);
+
+        if(!cartao_num) return res.status(400).json({msg:"É necessário preencher o campo"})
+
+        res.status(201).json({msg:"Novo cartão adicionado"})
+    }
+    catch(error){
+        res.status(500).json({msg:"Ocorreu um erro ao registrar"})
+        console.error(error);
+    }
+}
+
+export const AtualizarCartao = async(req,res) => {
+    const id_cliente = req.params.id_cliente;
+    const id_cartao = req.params.id_cartao;
+    const {cartao_num,tipo} = req.body;
+    try{
+        const AtuCartao = await ClienteModel.AtualizarCartao(cartao_num,tipo,id_cliente,id_cartao);
+
+        if(!cartao_num) return res.status(400).json({msg:"É necessário preencher o campo"});
+
+        if(!AtuCartao) return res.status(404).json({msg:"Não encontrado",id_cliente,id_cartao});
+
+        res.status(200).json({msg:"Cartão atualizado"});
+    }
+    catch(error){
+        res.status(500).json({msg:"Ocorreu um erro ao atualizar"});
+        console.error(error);
+    }
+}
+
+export const DeletarCartao = async(req,res) => {
+
+    const id_cliente = req.params.id_cliente;
+    const id_cartao = req.params.id_cartao;
+    try{
+        const DelCartao = await ClienteModel.DeletarCartao(id_cliente,id_cartao);
+
+        if(!DelCartao) return res.status(404).json({msg:"Não encontrado"});
+
+        res.status(200).json({msg:"Telefone apagado"});
     }
     catch(error){
         res.status(500).json({msg:"Ocorreu um erro ao apagar"});

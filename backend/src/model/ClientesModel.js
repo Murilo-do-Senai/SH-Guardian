@@ -71,21 +71,22 @@ export async function RegistroCartao(CARTAO_NUM,TIPO,id_cliente) {
     
 }
 
-export async function AtualizarCartao(id,CARTAO_NUM,TIPO) {
+export async function AtualizarCartao(CARTAO_NUM,TIPO,id_cliente,id_cartao) {
 
     const [resultado] = await conexao.query(`
-        UPDATE CARTAO SET CARTAO_NUM = ?,TIPO = ? 
-        `,[id,CARTAO_NUM,TIPO || "credito"|| "debito"])
+        UPDATE CARTAO SET CARTAO_NUM = ?,TIPO = ? WHERE ID_cliente = ? AND id_cartao = ?;
+        `,[CARTAO_NUM,TIPO || "credito"|| "debito",id_cliente,id_cartao]);
 
-        return resultado[0]
+        return resultado[0];
     
 }
 
-export async function DeletarCartao(id){
+export async function DeletarCartao(id_cliente,id_cartao){
     const [resultado] = await conexao.query(`
-        DELETE FROM CARTAO WHERE ID = ?
-        `,[id])
-        return resultado[0]
+        DELETE FROM CARTAO WHERE ID_cliente = ? and id_cartao = ?
+        `,[id_cliente,id_cartao]);
+
+        return resultado[0];
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -101,20 +102,20 @@ export async function RegistroTelefone(fone,id_cliente) {
     
 }
 
-export async function AtualizarTelefone(FONE,ID_CLIENTE) {
+export async function AtualizarTelefone(FONE,ID_CLIENTE,id_telefone) {
 
     const [resultado] = await conexao.query(`
-        UPDATE TELEFONE SET FONE = ? WHERE ID_CLIENTE = ?
-        `,[FONE,ID_CLIENTE])
+        UPDATE TELEFONE SET FONE = ? WHERE ID_CLIENTE = ? and id_telefone = ?
+        `,[FONE,ID_CLIENTE,id_telefone])
 
         return resultado.affectedRows;
     
 }
 
-export async function DeletarTelefone(id_cliente){
+export async function DeletarTelefone(id_cliente,id_telefone){
     const [resultado] = await conexao.query(`
-        DELETE FROM TELEFONE WHERE ID_cliente = ?
-        `,[id_cliente])
+        DELETE FROM TELEFONE WHERE ID_cliente = ? and id_telefone = ?
+        `,[id_cliente,id_telefone])
 
         return resultado[0];
 }
