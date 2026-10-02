@@ -24,7 +24,7 @@ export async function ListarClienteId(id){
         WHERE ID = ?
         `,[id])
 
-    return resultado[0];
+    return resultado;
 }
 
 export async function RegistroCliente({nome,cpf,email,senha,endereco,plano}) {
@@ -32,7 +32,7 @@ export async function RegistroCliente({nome,cpf,email,senha,endereco,plano}) {
     const [resultado] = await conexao.query(`
         INSERT INTO CLIENTES (NOME,CPF,EMAIL,SENHA,ENDERECO,PLANO)
         VALUES (?,?,?,?,?,?)
-        `,[nome,cpf,email,senha,endereco,plano || "essencial"|| "profissional"|| "premium"])
+        `,[nome,cpf,email,senha,endereco,plano || "essencial"])
 
     return resultado.insertId;
     
@@ -55,7 +55,7 @@ export async function DeletarCliente(id){
         DELETE FROM CLIENTES WHERE ID = ?;
         `,[id])
 
-        return resultado[0];
+        return resultado;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ export async function AtualizarCartao(CARTAO_NUM,TIPO,id_cliente,id_cartao) {
         UPDATE CARTAO SET CARTAO_NUM = ?,TIPO = ? WHERE ID_cliente = ? AND id_cartao = ?;
         `,[CARTAO_NUM,TIPO || "credito"|| "debito",id_cliente,id_cartao]);
 
-        return resultado[0];
+        return resultado.affectedRows;
     
 }
 
@@ -86,7 +86,7 @@ export async function DeletarCartao(id_cliente,id_cartao){
         DELETE FROM CARTAO WHERE ID_cliente = ? and id_cartao = ?
         `,[id_cliente,id_cartao]);
 
-        return resultado[0];
+        return resultado;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -117,5 +117,5 @@ export async function DeletarTelefone(id_cliente,id_telefone){
         DELETE FROM TELEFONE WHERE ID_cliente = ? and id_telefone = ?
         `,[id_cliente,id_telefone])
 
-        return resultado[0];
+        return resultado;
 }
