@@ -1,6 +1,8 @@
 import { conexao } from '../config/SQL.js';
 import * as ClienteModel from '../model/ClientesModel.js';
 import bcrypt from 'bcrypt';
+import jwt from "jsonwebtoken";
+import { jwtConfig } from "../config/jwt.js";
 
 export const ListarCliente = async(req,res) =>{
 
@@ -108,6 +110,62 @@ export const DeletarCliente = async(req,res) =>{
     }
 }
 
+export const LoginCliente = async (req, res) => {
+
+  try {
+    const { email, senha } = req.body;
+
+    if (!email || !senha) {
+      return res.status(400).json({ mensagem: "Email e senha são obrigatórios" });
+    }
+
+    const [rows] = await conexao.query(
+      "SELECT id, nome, email, senha FROM clientes WHERE email = ?",
+      [email]
+    );
+
+    console.log(rows)
+
+    if (rows.length === 0) {
+      return res.status(404).json({ mensagem: "Usuário não encontrado" });
+    }
+
+    const usuario = rows[0];
+
+    console.log(usuario)
+
+    if (!usuario.senha) {
+      return res.status(500).json({ mensagem: "Senha do usuário não encontrada no banco" });
+    }
+
+    const senhaValida = await bcrypt.compare(senha, usuario.senha);
+
+    if (!senhaValida) {
+      return res.status(401).json({ mensagem: "Senha inválida" });
+    }
+
+    const token = jwt.sign(
+      {
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+        perfil: usuario.perfil
+      },
+      jwtConfig.secret,
+      { expiresIn: "8h" }
+    );
+
+    res.json({
+      mensagem: "Login realizado com sucesso",
+      token
+    });
+  } catch (error) {
+    res.status(500).json({mensagem: "Erro no login"});
+      console.error(error);
+      
+  } 
+};
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 export const RegistroTelefone = async(req,res) => {
@@ -210,7 +268,7 @@ export const DeletarCartao = async(req,res) => {
 
         if(!DelCartao) return res.status(404).json({msg:"Não encontrado"});
 
-        res.status(200).json({msg:"Telefone apagado"});
+        res.status(200).json({msg:"Cartão apagado"});
     }
     catch(error){
         res.status(500).json({msg:"Ocorreu um erro ao apagar"});
