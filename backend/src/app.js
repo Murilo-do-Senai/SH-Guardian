@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import ClienteRoute from './routes/ClientesRoute.js';
 import MoveisRoute from "./routes/MoveisRoute.js";
+import IoTRoute from './routes/IOTRoute.js'
 
 const app = express();
 app.use(express.json());
@@ -12,6 +13,7 @@ app.get("/", (req, res) => res.json({ ok: true, api: "SH Guardian API" }));
 
 app.use("/clientes",ClienteRoute);
 app.use("/moveis",MoveisRoute);
+app.use("/iot", IoTRoute);
 
 
 

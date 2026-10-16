@@ -60,12 +60,12 @@ export async function DeletarCliente(id){
 
 ///////////////////////////////////////////////////////////////////////////////
 
-export async function RegistroCartao(CARTAO_NUM,TIPO,id_cliente) {
+export async function RegistroCartao(CARTAO_NUM,TIPO,validade,cvc,id_cliente) {
 
     const [resultado] = await conexao.query(`
-        INSERT INTO CARTAO (CARTAO_NUM,TIPO,id_cliente)
-        VALUES (?,?,?)
-        `,[CARTAO_NUM,TIPO || "credito"|| "debito",id_cliente])
+        INSERT INTO CARTAO (CARTAO_NUM,TIPO,VALIDADE,CVC,id_cliente)
+        VALUES (?,?,?,?,?)
+        `,[CARTAO_NUM,TIPO || "credito"|| "debito",validade,cvc,id_cliente])
 
     return resultado.insertId;
     

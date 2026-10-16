@@ -38,9 +38,9 @@ export const RegistroCliente = async(req,res) =>{
     
     try {
 
-       const {nome,cpf,email,senha,endereco,plano,fone,cartao_num,tipo} = req.body; 
+       const {nome,cpf,email,senha,endereco,plano,fone,cartao_num,validade,cvc,tipo} = req.body; 
 
-        if (!nome || !cpf || !email || !senha || !endereco || !fone || !cartao_num) {
+        if (!nome || !cpf || !email || !senha || !endereco || !fone || !cartao_num || !validade || ! cvc) {
             return res.status(400).json({ messagem: "É necessário preencher os campos" })
         };
 
@@ -56,7 +56,7 @@ export const RegistroCliente = async(req,res) =>{
 
         const telefone = await ClienteModel.RegistroTelefone(fone,id);
 
-        const cartao = await ClienteModel.RegistroCartao(cartao_num,tipo,id);
+        const cartao = await ClienteModel.RegistroCartao(cartao_num,tipo,validade,cvc,id);
 
         res.status(201).json({msg:"Resgistro completo com exito",id});
 
@@ -226,9 +226,9 @@ export const DeletarTelefone = async(req,res) => {
 
 export const RegistroCartao = async(req,res) => {
     const id_cliente = req.params.id;
-    const {cartao_num,tipo} = req.body;
+    const {cartao_num,tipo,validade,cvc} = req.body;
     try{
-        const RegisCartao = await ClienteModel.RegistroCartao(cartao_num,tipo,id_cliente);
+        const RegisCartao = await ClienteModel.RegistroCartao(cartao_num,tipo,validade,cvc,id_cliente);
 
         if(!cartao_num) return res.status(400).json({msg:"É necessário preencher o campo"})
 
